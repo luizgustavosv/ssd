@@ -1,5 +1,5 @@
 from .voc0712 import VOCDetection, VOCAnnotationTransform, VOC_CLASSES, VOC_ROOT
-from .voc_custom import VOCCustomDetection
+from .voc_custom import VOCCustomDetection, CUSTOM_CLASSES
 
 from .coco import COCODetection, COCOAnnotationTransform, COCO_CLASSES, COCO_ROOT, get_label_map
 from .config import *
