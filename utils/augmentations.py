@@ -67,6 +67,8 @@ class Lambda(object):
 
 class ConvertFromInts(object):
     def __call__(self, image, boxes=None, labels=None):
+        if hasattr(cv2, 'UMat') and isinstance(image, cv2.UMat):
+            image = image.get()
         return image.astype(np.float32), boxes, labels
 
 
@@ -75,6 +77,8 @@ class SubtractMeans(object):
         self.mean = np.array(mean, dtype=np.float32)
 
     def __call__(self, image, boxes=None, labels=None):
+        if hasattr(cv2, 'UMat') and isinstance(image, cv2.UMat):
+            image = image.get()
         image = image.astype(np.float32)
         image -= self.mean
         return image.astype(np.float32), boxes, labels
@@ -203,6 +207,8 @@ class ToCV2Image(object):
 
 class ToTensor(object):
     def __call__(self, cvimage, boxes=None, labels=None):
+        if hasattr(cv2, 'UMat') and isinstance(cvimage, cv2.UMat):
+            cvimage = cvimage.get()
         return torch.from_numpy(cvimage.astype(np.float32)).permute(2, 0, 1), boxes, labels
 
 

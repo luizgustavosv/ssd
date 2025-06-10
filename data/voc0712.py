@@ -124,6 +124,8 @@ class VOCDetection(data.Dataset):
 
         target = ET.parse(self._annopath % img_id).getroot()
         img = cv2.imread(self._imgpath % img_id)
+        if hasattr(cv2, 'UMat') and isinstance(img, cv2.UMat):
+            img = img.get()
         height, width, channels = img.shape
 
         if self.target_transform is not None:
@@ -151,7 +153,10 @@ class VOCDetection(data.Dataset):
             PIL img
         '''
         img_id = self.ids[index]
-        return cv2.imread(self._imgpath % img_id, cv2.IMREAD_COLOR)
+        img = cv2.imread(self._imgpath % img_id, cv2.IMREAD_COLOR)
+        if hasattr(cv2, 'UMat') and isinstance(img, cv2.UMat):
+            img = img.get()
+        return img
 
     def pull_anno(self, index):
         '''Returns the original annotation of image at index
