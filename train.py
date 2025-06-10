@@ -87,10 +87,10 @@ def train():
                                transform=SSDAugmentation(cfg['min_dim'],
                                                          MEANS))
     elif args.dataset == 'CUSTOM':
-        cfg = voc
-        dataset = VOCCustomDetection(root=args.dataset_root,
-                                     transform=SSDAugmentation(cfg['min_dim'],
-                                                               MEANS))
+        cfg = custom
+        dataset = VOCCustomDetection(
+            root=args.dataset_root,
+            transform=SSDAugmentation(cfg['min_dim'], MEANS))
 
     if args.visdom:
         import visdom

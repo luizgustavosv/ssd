@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from layers import *
-from data import voc, coco
+from data import voc, coco, custom
 import os
 
 
@@ -28,7 +28,12 @@ class SSD(nn.Module):
         super(SSD, self).__init__()
         self.phase = phase
         self.num_classes = num_classes
-        self.cfg = (coco, voc)[num_classes == 21]
+        if num_classes == 21:
+            self.cfg = voc
+        elif num_classes == 201:
+            self.cfg = coco
+        else:
+            self.cfg = custom
         self.priorbox = PriorBox(self.cfg)
         self.register_buffer('priors', self.priorbox.forward())
         self.size = size

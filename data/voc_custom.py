@@ -10,12 +10,18 @@ if sys.version_info[0] == 2:
 else:
     import xml.etree.ElementTree as ET
 
-from .voc0712 import VOCAnnotationTransform, VOC_CLASSES
+from .voc0712 import VOCAnnotationTransform
+
+# only one class in this dataset
+CUSTOM_CLASSES = ('human',)
 
 class VOCCustomDetection(data.Dataset):
     """VOC Detection Dataset without year-specific subfolders."""
     def __init__(self, root, image_sets=['trainval'],
-                 transform=None, target_transform=VOCAnnotationTransform(),
+                 transform=None,
+                 target_transform=VOCAnnotationTransform(
+                     class_to_ind=dict(zip(CUSTOM_CLASSES,
+                                          range(len(CUSTOM_CLASSES))))),
                  dataset_name='VOCCUSTOM'):
         self.root = root
         self.image_set = image_sets
