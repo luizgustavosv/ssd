@@ -6,7 +6,6 @@ import torch
 import torch.nn as nn
 import torch.backends.cudnn as cudnn
 import torchvision.transforms as transforms
-from torch.autograd import Variable
 from data import VOC_ROOT, VOC_CLASSES as labelmap
 from PIL import Image
 from data import VOCAnnotationTransform, VOCDetection, BaseTransform, VOC_CLASSES
@@ -44,7 +43,7 @@ def test_net(save_folder, net, cuda, testset, transform, thresh):
         img = testset.pull_image(i)
         img_id, annotation = testset.pull_anno(i)
         x = torch.from_numpy(transform(img)[0]).permute(2, 0, 1)
-        x = Variable(x.unsqueeze(0))
+        x = x.unsqueeze(0)
 
         with open(filename, mode='a') as f:
             f.write('\nGROUND TRUTH FOR: '+img_id+'\n')
@@ -53,8 +52,9 @@ def test_net(save_folder, net, cuda, testset, transform, thresh):
         if cuda:
             x = x.cuda()
 
-        y = net(x)      # forward pass
-        detections = y.data
+        with torch.no_grad():
+            y = net(x)      # forward pass
+        detections = y
         # scale each detection back up to the image
         scale = torch.Tensor([img.shape[1], img.shape[0],
                              img.shape[1], img.shape[0]])
