@@ -125,6 +125,8 @@ class COCODetection(data.Dataset):
         path = osp.join(self.root, self.coco.loadImgs(img_id)[0]['file_name'])
         assert osp.exists(path), 'Image path does not exist: {}'.format(path)
         img = cv2.imread(osp.join(self.root, path))
+        if hasattr(cv2, 'UMat') and isinstance(img, cv2.UMat):
+            img = img.get()
         height, width, _ = img.shape
         if self.target_transform is not None:
             target = self.target_transform(target, width, height)
@@ -151,7 +153,10 @@ class COCODetection(data.Dataset):
         '''
         img_id = self.ids[index]
         path = self.coco.loadImgs(img_id)[0]['file_name']
-        return cv2.imread(osp.join(self.root, path), cv2.IMREAD_COLOR)
+        img = cv2.imread(osp.join(self.root, path), cv2.IMREAD_COLOR)
+        if hasattr(cv2, 'UMat') and isinstance(img, cv2.UMat):
+            img = img.get()
+        return img
 
     def pull_anno(self, index):
         '''Returns the original annotation of image at index

@@ -29,6 +29,8 @@ def detection_collate(batch):
 
 
 def base_transform(image, size, mean):
+    if hasattr(cv2, 'UMat') and isinstance(image, cv2.UMat):
+        image = image.get()
     x = cv2.resize(image, (size, size)).astype(np.float32)
     x -= mean
     x = x.astype(np.float32)
