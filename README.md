@@ -79,6 +79,13 @@ wget https://s3.amazonaws.com/amdegroot-models/vgg16_reducedfc.pth
 python train.py
 ```
 
+To train using your own dataset stored in Pascal VOC format, select the
+`CUSTOM` option and provide the root directory of the dataset. For example:
+
+```Shell
+python train.py --dataset CUSTOM --dataset_root C:\\Experimentos\\datasets\\Heridal\\formato_PASCAL_VOC
+```
+
 - Note:
   * For training, an NVIDIA GPU is strongly recommended for speed.
   * For instructions on Visdom usage/installation, see the <a href='#installation'>Installation</a> section.
