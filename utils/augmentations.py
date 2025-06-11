@@ -317,20 +317,37 @@ class RandomSampleCrop(object):
 
 
 class Expand(object):
-    def __init__(self, mean):
+    def __init__(self, mean, max_ratio=2.0, max_size=4096):
+        """Randomly place the image on a canvas of a larger size.
+
+        Args:
+            mean (tuple): values to fill the canvas.
+            max_ratio (float): Maximum scale for the expanded image.
+            max_size (int): Optional limit for the expanded image's
+                width or height. This helps avoid allocating very
+                large arrays when working with high resolution images.
+        """
         self.mean = mean
+        self.max_ratio = max_ratio
+        self.max_size = max_size
 
     def __call__(self, image, boxes, labels):
         if random.randint(2):
             return image, boxes, labels
 
         height, width, depth = image.shape
-        ratio = random.uniform(1, 4)
-        left = random.uniform(0, width*ratio - width)
-        top = random.uniform(0, height*ratio - height)
+        ratio = random.uniform(1, self.max_ratio)
+        if self.max_size is not None:
+            limit = min(float(self.max_size) / height,
+                        float(self.max_size) / width)
+            ratio = min(ratio, limit)
+        if ratio <= 1:
+            return image, boxes, labels
+        left = random.uniform(0, width * ratio - width)
+        top = random.uniform(0, height * ratio - height)
 
         expand_image = np.zeros(
-            (int(height*ratio), int(width*ratio), depth),
+            (int(height * ratio), int(width * ratio), depth),
             dtype=image.dtype)
         expand_image[:, :, :] = self.mean
         expand_image[int(top):int(top + height),
@@ -405,14 +422,15 @@ class PhotometricDistort(object):
 
 
 class SSDAugmentation(object):
-    def __init__(self, size=300, mean=(104, 117, 123)):
+    def __init__(self, size=300, mean=(104, 117, 123), expand_ratio=2.0):
         self.mean = mean
         self.size = size
+        self.expand_ratio = expand_ratio
         self.augment = Compose([
             ConvertFromInts(),
             ToAbsoluteCoords(),
             PhotometricDistort(),
-            Expand(self.mean),
+            Expand(self.mean, max_ratio=self.expand_ratio),
             RandomSampleCrop(),
             RandomMirror(),
             ToPercentCoords(),
