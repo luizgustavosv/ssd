@@ -50,6 +50,8 @@ parser.add_argument('--visdom', default=False, type=str2bool,
                     help='Use visdom for loss visualization')
 parser.add_argument('--save_folder', default='weights/',
                     help='Directory for saving checkpoint models')
+parser.add_argument('--expand_ratio', default=2.0, type=float,
+                    help='Maximum expansion ratio used in data augmentation')
 args = parser.parse_args()
 
 
@@ -76,21 +78,24 @@ def train():
                   "--dataset_root was not specified.")
             args.dataset_root = COCO_ROOT
         cfg = coco
-        dataset = COCODetection(root=args.dataset_root,
-                                transform=SSDAugmentation(cfg['min_dim'],
-                                                          MEANS))
+        dataset = COCODetection(
+            root=args.dataset_root,
+            transform=SSDAugmentation(cfg['min_dim'], MEANS,
+                                      expand_ratio=args.expand_ratio))
     elif args.dataset == 'VOC':
         if args.dataset_root == COCO_ROOT:
             parser.error('Must specify dataset if specifying dataset_root')
         cfg = voc
-        dataset = VOCDetection(root=args.dataset_root,
-                               transform=SSDAugmentation(cfg['min_dim'],
-                                                         MEANS))
+        dataset = VOCDetection(
+            root=args.dataset_root,
+            transform=SSDAugmentation(cfg['min_dim'], MEANS,
+                                      expand_ratio=args.expand_ratio))
     elif args.dataset == 'CUSTOM':
         cfg = custom
         dataset = VOCCustomDetection(
             root=args.dataset_root,
-            transform=SSDAugmentation(cfg['min_dim'], MEANS))
+            transform=SSDAugmentation(cfg['min_dim'], MEANS,
+                                      expand_ratio=args.expand_ratio))
 
     if args.visdom:
         import visdom
